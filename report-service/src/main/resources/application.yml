@@ -1,69 +1,25 @@
-server:
-  port: ${SERVER_PORT:8008}
-  shutdown: graceful
-
 spring:
   config:
     import: optional:file:.env[.properties]
   application:
-    name: ${SPRING_APP_NAME:report-service}
-
+    name: report-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:report_db}?sslmode=require
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:report_db}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:healntrack1234}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: ${DB_MAX_POOL:20}
-      minimum-idle: ${DB_MIN_IDLE:5}
-      idle-timeout: ${DB_IDLE_TIMEOUT_MS:30000}
-      connection-timeout: ${DB_CONN_TIMEOUT_MS:30000}
-      max-lifetime: ${DB_MAX_LIFETIME_MS:1800000}
-
-  jackson:
-    property-naming-strategy: LOWER_CAMEL_CASE
-
-  jpa:
-    hibernate:
-      ddl-auto: none
-    open-in-view: false
-    properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-      hibernate.jdbc.time_zone: UTC
-      hibernate.format_sql: true
-      hibernate.jdbc.lob.non_contextual_creation: true
-
   kafka:
-    bootstrap-servers: ${KAFKA_HOST:localhost}:9092
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
     consumer:
-      group-id: ${KAFKA_GROUP:report-service}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
       auto-offset-reset: latest
       enable-auto-commit: false
-      properties:
-        isolation.level: read_committed
-        max.poll.interval.ms: 600000
-        session.timeout.ms: 15000
-        heartbeat.interval.ms: 5000
-        max.poll.records: 500
-    producer:
-      acks: all
-      retries: 5
-      properties:
-        linger.ms: 5
-        enable.idempotence: true
     listener:
+      ack-mode: record
       concurrency: ${KAFKA_CONCURRENCY:3}
 
-topics:
-  pharmacy:
-    sale:
-      completed: ${TOPIC_PHARMACY_SALE_COMPLETED:pharmacy.sale.completed}
-
-logging:
-  level:
-    root: ${LOG_LEVEL_ROOT:INFO}
-    org.hibernate.SQL: ${LOG_LEVEL_HIBERNATE_SQL:info}
-    org.hibernate.orm.jdbc.bind: ${LOG_LEVEL_HIBERNATE_BIND:info}
+server:
+  port: ${SERVER_PORT:8008}
 
 eureka:
   instance:
@@ -72,4 +28,4 @@ eureka:
     lease-expiration-duration-in-seconds: 90
   client:
     service-url:
-      defaultZone: http://${EUREKA_HOSTNAME:localhost}:${EUREKA_PORT:8761}/eureka/
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
