@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${meta != null and #maps.containsKey(meta,'title') and meta['title'] != null ? meta['title'] : 'Reporte'}">
+        Reporte</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 16mm 14mm;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: #111;
+        }
+
+        h1 {
+            margin: 0 0 6px 0;
+            font-size: 18px;
+        }
+
+        h2 {
+            margin: 12px 0 6px 0;
+            font-size: 14px;
+        }
+
+        .muted {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .col {
+            flex: 1 1 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 6px 4px;
+            vertical-align: top;
+        }
+
+        th {
+            text-align: left;
+            background: #f8f8f8;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
+
+        .warn {
+            color: #b80;
+        }
+
+        .danger {
+            color: #b00;
+        }
+
+        .ok {
+            color: #0a6;
+        }
+
+        .note {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+<header style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+    <img src="https://trackmyhealth.gr/wp-content/uploads/2020/05/logo-new-500.png" alt="Logo" style="height:48px;"/>
+    <div>
+        <h1 th:text="${meta != null and #maps.containsKey(meta,'title') and meta['title'] != null ? meta['title'] : 'Reporte'}">
+            Título del reporte</h1>
+        <div class="muted"
+             th:if="${meta != null and #maps.containsKey(meta,'subtitle') and meta['subtitle'] != null}"
+             th:text="${meta['subtitle']}">Subtítulo
+        </div>
+        <div class="muted"
+             th:if="${meta != null and #maps.containsKey(meta,'generatedAt') and meta['generatedAt'] != null}">
+            Generado: <span th:text="${meta['generatedAt']}">2025-10-31 19:00</span>
+        </div>
+    </div>
+</header>
+
+<section th:if="${filters}">
+    <div class="row">
+        <div class="col" th:each="f : ${filters}">
+            <div><span class="bold" th:text="${f['label']}">Filtro</span>:
+                <span th:text="${f['value']}">valor</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section th:each="sec,iter : ${sections}">
+    <h2 th:if="${#maps.containsKey(sec,'title') and sec['title'] != null}" th:text="${sec['title']}">Sección</h2>
+
+    <div th:if="${sec['type'] == 'text'}">
+        <div th:each="p : ${sec['paragraphs']}">
+            <p th:text="${p}">Texto...</p>
+        </div>
+    </div>
+
+    <div th:if="${sec['type'] == 'table'}">
+        <table>
+            <thead>
+            <tr>
+                <th th:each="c : ${sec['columns']}" th:text="${c['header']}">Col</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${sec['rows']}">
+                <td th:each="c : ${sec['columns']}"
+                    th:classappend="${(#maps.containsKey(c,'align') and c['align'] != null ? c['align'] : '')
+                                   + (#maps.containsKey(row, c['field'] + 'Class') and row[c['field'] + 'Class'] != null ? ' ' + row[c['field'] + 'Class'] : '')}"
+                    th:utext="${row[c['field']] != null ? row[c['field']] : ''}">valor
+                </td>
+            </tr>
+            </tbody>
+            <tfoot th:if="${#maps.containsKey(sec,'totals') and sec['totals'] != null}">
+            <tr>
+                <td th:each="c,ci : ${sec['columns']}"
+                    th:classappend="${#maps.containsKey(c,'align') and c['align'] != null ? c['align'] : ''}">
+                    <span th:if="${ci.index == sec['totals']['labelCol']}" class="bold">TOTAL</span>
+                    <span th:unless="${ci.index == sec['totals']['labelCol']}"
+                          th:text="${(#maps.containsKey(sec['totals']['values'], c['field']) and sec['totals']['values'][c['field']] != null) ? sec['totals']['values'][c['field']] : ''}"></span>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="note" th:if="${#maps.containsKey(sec,'note') and sec['note'] != null}" th:text="${sec['note']}">
+            Nota…
+        </div>
+    </div>
+
+    <div th:if="${sec['type'] == 'grouped-table'}">
+        <div th:each="g : ${sec['groups']}">
+            <div class="bold" th:text="${g['label']}">Grupo</div>
+            <table>
+                <thead>
+                <tr>
+                    <th th:each="c : ${sec['columns']}" th:text="${c['header']}">Col</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="row : ${g['rows']}">
+                    <td th:each="c : ${sec['columns']}"
+                        th:classappend="${(#maps.containsKey(c,'align') and c['align'] != null ? c['align'] : '')
+                                       + (#maps.containsKey(row, c['field'] + 'Class') and row[c['field'] + 'Class'] != null ? ' ' + row[c['field'] + 'Class'] : '')}"
+                        th:utext="${row[c['field']] != null ? row[c['field']] : ''}">valor
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot th:if="${#maps.containsKey(g,'totals') and g['totals'] != null}">
+                <tr>
+                    <td th:each="c,ci : ${sec['columns']}"
+                        th:classappend="${#maps.containsKey(c,'align') and c['align'] != null ? c['align'] : ''}">
+                        <span th:if="${ci.index == g['totals']['labelCol']}" class="bold">SUBTOTAL</span>
+                        <span th:unless="${ci.index == g['totals']['labelCol']}"
+                              th:text="${(#maps.containsKey(g['totals']['values'], c['field']) and g['totals']['values'][c['field']] != null) ? g['totals']['values'][c['field']] : ''}"></span>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="note" th:if="${#maps.containsKey(sec,'note') and sec['note'] != null}" th:text="${sec['note']}">
+            Nota…
+        </div>
+    </div>
+
+    <div th:if="${#maps.containsKey(sec,'pageBreakAfter') and sec['pageBreakAfter']}" class="page-break"></div>
+</section>
+
+<footer th:if="${meta != null and #maps.containsKey(meta,'footer') and meta['footer'] != null}" class="muted"
+        style="margin-top:10px;" th:text="${meta['footer']}">
+    Pie de página…
+</footer>
+
+</body>
+</html>

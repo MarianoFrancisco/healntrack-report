@@ -1,0 +1,37 @@
+@host = localhost
+@port = 8008
+@baseUrl = http://{{host}}:{{port}}
+
+@from = 2025-11-01
+@to = 2025-11-01
+@areaId = 0
+
+### API docs (OpenAPI 3.1)
+GET {{baseUrl}}/v3/api-docs
+Accept: application/json
+
+###
+
+### Generar reporte de utilidades en PDF
+POST {{baseUrl}}/reports/profits/pdf
+Accept: */*
+Content-Type: application/json
+
+{
+  "from": "{{from}}",
+  "to": "{{to}}",
+  "areaId": {{areaId}}
+}
+
+### Generar reporte de utilidades en PDF y guardar archivo
+POST {{baseUrl}}/reports/profits/pdf
+Accept: */*
+Content-Type: application/json
+
+{
+  "from": "{{from}}",
+  "to": "{{to}}",
+  "areaId": {{areaId}}
+}
+
+> ./profits-report.pdf
