@@ -1,7 +1,6 @@
 package com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence.specification;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -16,10 +15,10 @@ public class TransactionSpecs {
                 : criteriaBuilder.equal(root.get("type"), type);
     }
 
-    public static Specification<TransactionEntity> hasArea(UUID areaId) {
-        return (root, query, criteriaBuilder) -> (areaId == null)
+    public static Specification<TransactionEntity> hasArea(String area) {
+        return (root, query, criteriaBuilder) -> (area == null || area.isBlank())
                 ? null
-                : criteriaBuilder.equal(root.get("area").get("id"), areaId);
+                : criteriaBuilder.equal(root.get("area").get("name"), area);
     }
 
     public static Specification<TransactionEntity> occurredBetween(
