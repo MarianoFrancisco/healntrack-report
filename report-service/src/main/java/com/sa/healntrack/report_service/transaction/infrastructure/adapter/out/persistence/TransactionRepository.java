@@ -1,5 +1,6 @@
 package com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,6 +72,7 @@ public class TransactionRepository implements SaveTransaction, FindAllTransactio
                         t.getType().equals(TransactionType.INCOME) ? t.getAmount() : t.getAmount().negate(),
                         t.getOccurredAt()
                 ))
+                .filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0)
                 .toList();
     }
 

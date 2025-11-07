@@ -25,7 +25,6 @@ public interface TransactionRestMapper {
     GetAllProfitsQuery toQuery(SearchProfitsRequestDTO requestDTO);
 
     @Mapping(target = "area", source = "profit.area.name.value")
-    @Mapping(target = "amount", source = "profit.amount.value")
     ProfitResponseDTO fromDomain(TransactionProfit profit);
 
 }
