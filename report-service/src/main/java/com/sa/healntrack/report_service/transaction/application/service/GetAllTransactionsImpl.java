@@ -7,15 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sa.healntrack.report_service.area.domain.value_object.EntityReference;
-import com.sa.healntrack.report_service.common.application.exception.EntityNotFoundException;
 import com.sa.healntrack.report_service.employee.application.port.out.persistence.FindEmployeeById;
-import com.sa.healntrack.report_service.employee.domain.Employee;
 import com.sa.healntrack.report_service.medicine.application.port.out.persistence.FindMedicineById;
-import com.sa.healntrack.report_service.medicine.domain.Medicine;
 import com.sa.healntrack.report_service.patient.application.port.out.persistence.FindPatientById;
-import com.sa.healntrack.report_service.patient.domain.Patient;
 import com.sa.healntrack.report_service.room.application.port.out.persistence.FindRoomById;
-import com.sa.healntrack.report_service.room.domain.Room;
 import com.sa.healntrack.report_service.transaction.application.port.in.get_all_transactions.GetAllTransactions;
 import com.sa.healntrack.report_service.transaction.application.port.in.get_all_transactions.GetAllTransactionsQuery;
 import com.sa.healntrack.report_service.transaction.application.port.out.persistence.FindAllTransactions;
@@ -47,27 +42,23 @@ public class GetAllTransactionsImpl implements GetAllTransactions {
     }
 
     private String getConcept(EntityReference entityReference, UUID referenceId) {
-        switch (entityReference) {
-            case EMPLOYEE:
-                Employee employee = findEmployeeById.findById(referenceId)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "No existe un empleado con id: " + referenceId));
-                return employee.getFullName().value();
-            case MEDICINE:
-                Medicine medicine = findMedicineById.findById(referenceId)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "No existe una medicina con id: " + referenceId));
-                return medicine.getName().value();
-            case ROOM:
-                Room room = findRoomById.findById(referenceId)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "No existe una habitacion con id: " + referenceId));
-                return room.getNumber().value();
-            default:
-                Patient patient = findPatientById.findById(referenceId)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "No existe un empleado con id: " + referenceId));
-                return patient.getFullName().value();
+        try {
+            return switch (entityReference) {
+                case EMPLOYEE -> findEmployeeById.findById(referenceId)
+                        .map(e -> e.getFullName().value())
+                        .orElse("Empleado desconocido");
+                case MEDICINE -> findMedicineById.findById(referenceId)
+                        .map(m -> m.getName().value())
+                        .orElse("Medicina desconocida");
+                case ROOM -> findRoomById.findById(referenceId)
+                        .map(r -> r.getNumber().value())
+                        .orElse("Habitación desconocida");
+                case PATIENT -> findPatientById.findById(referenceId)
+                        .map(p -> p.getFullName().value())
+                        .orElse("Paciente desconocido");
+            };
+        } catch (Exception e) {
+            return "Desconocido";
         }
     }
 
