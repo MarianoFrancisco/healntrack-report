@@ -10,7 +10,6 @@ create table dim_employee (
     id uuid primary key,
     cui char(13) unique not null,
     full_name varchar(200) not null,
-    department varchar(50) not null,
     created_at timestamp not null,
     updated_at timestamp not null
 );
