@@ -25,7 +25,7 @@ public class RoomConsumer {
     private final CreateRoom createRoom;
     private final UpdateRoom updateRoom;
 
-    @KafkaListener(topics = "hospitalization.room.updated")
+    @KafkaListener(topics = "hospitalization.room.created")
     public void listenRoomCreated(ConsumerRecord<String, byte[]> record) {
         try {
             RoomCreatedMessage message = objectMapper
