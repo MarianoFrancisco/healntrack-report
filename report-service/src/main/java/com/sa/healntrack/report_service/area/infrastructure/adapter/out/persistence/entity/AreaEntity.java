@@ -2,7 +2,11 @@ package com.sa.healntrack.report_service.area.infrastructure.adapter.out.persist
 
 import java.util.UUID;
 
+import com.sa.healntrack.report_service.area.domain.value_object.EntityReference;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -19,5 +23,7 @@ public class AreaEntity {
     @Id
     private UUID id;
     private String name;
+    @Enumerated(EnumType.STRING)
+    private EntityReference entityReference;
 
 }

@@ -1,8 +1,9 @@
-insert into dim_area (name)
+insert into dim_area (name, entity_reference)
 values
-    ('CONSULTATION'),
-    ('MEDICATION'),
-    ('PHARMACY'),
-    ('EMPLOYEE'),
-    ('STAY'),
-    ('SURGERY');
+    ('CONSULTATION', 'PATIENT'),
+    ('MEDICATION', 'MEDICINE'),
+    ('PHARMACY', 'MEDICINE'),
+    ('EMPLOYEE', 'EMPLOYEE'),
+    ('ROOM', 'ROOM'),
+    ('STAY', 'PATIENT'),
+    ('SURGERY', 'PATIENT');
