@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sa.healntrack.report_service.area.domain.Area;
 import com.sa.healntrack.report_service.transaction.application.port.in.get_all_profits.GetAllProfitsQuery;
 import com.sa.healntrack.report_service.transaction.application.port.in.get_all_transactions.GetAllTransactionsQuery;
 import com.sa.healntrack.report_service.transaction.application.port.out.persistence.ExistsTransactionByReferenceId;
@@ -16,6 +17,7 @@ import com.sa.healntrack.report_service.transaction.application.port.out.persist
 import com.sa.healntrack.report_service.transaction.application.port.out.persistence.SaveTransaction;
 import com.sa.healntrack.report_service.transaction.domain.Transaction;
 import com.sa.healntrack.report_service.transaction.domain.TransactionProfit;
+import com.sa.healntrack.report_service.transaction.domain.value_object.TransactionType;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence.entity.TransactionEntity;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence.mapper.TransactionPersistenceMapper;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence.repository.TransactionEntityRepository;
@@ -59,7 +61,17 @@ public class TransactionRepository implements SaveTransaction, FindAllTransactio
     @Transactional(readOnly = true)
     @Override
     public List<TransactionProfit> findAll(GetAllProfitsQuery query) {
-        return repository.findProfits(query.area(), query.startDate(), query.endDate());
+        Specification<TransactionEntity> specs = Specification.allOf(
+                TransactionSpecs.hasArea(query.area()),
+                TransactionSpecs.occurredBetween(query.startDate(), query.endDate()));
+        return repository.findAll(specs).stream()
+                .map(t -> new TransactionProfit(
+                        t.getReferenceId(),
+                        new Area(t.getArea().getId(), t.getArea().getName(), t.getArea().getEntityReference()),
+                        t.getType().equals(TransactionType.INCOME) ? t.getAmount() : t.getAmount().negate(),
+                        t.getOccurredAt()
+                ))
+                .toList();
     }
 
 }
