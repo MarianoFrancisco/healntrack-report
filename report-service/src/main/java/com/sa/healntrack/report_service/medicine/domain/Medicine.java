@@ -14,7 +14,7 @@ public class Medicine {
     private Name name;
 
     public Medicine(UUID id, String name) {
-        this.id = new MedicineId(UUID.randomUUID());
+        this.id = new MedicineId(id);
         this.name = new Name(name);
     }
 
