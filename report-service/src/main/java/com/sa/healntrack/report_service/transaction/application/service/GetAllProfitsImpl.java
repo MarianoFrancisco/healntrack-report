@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class GetAllProfitsImpl implements GetAllProfits {
     
-    private FindAllProfits findAllProfits;
+    private final FindAllProfits findAllProfits;
     private final FindPatientById findPatientById;
     private final FindMedicineById findMedicineById;
     private final FindEmployeeById findEmployeeById;
