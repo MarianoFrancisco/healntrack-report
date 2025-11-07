@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sa.healntrack.report_service.transaction.application.port.in.get_all_profits.GetAllProfits;
 import com.sa.healntrack.report_service.transaction.application.port.in.get_all_transactions.GetAllTransactions;
+import com.sa.healntrack.report_service.transaction.infrastructure.adapter.in.rest.dto.ProfitResponseDTO;
+import com.sa.healntrack.report_service.transaction.infrastructure.adapter.in.rest.dto.SearchProfitsRequestDTO;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.in.rest.dto.SearchTransactionsRequestDTO;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.in.rest.dto.TransactionResponseDTO;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.in.rest.mapper.TransactionRestMapper;
@@ -22,6 +25,7 @@ public class TransactionController {
     
     private final TransactionRestMapper mapper;
     private final GetAllTransactions getAllTransactions;
+    private final GetAllProfits getAllProfits;
 
     @GetMapping
     public ResponseEntity<List<TransactionResponseDTO>> getAll(
@@ -33,5 +37,16 @@ public class TransactionController {
                     .toList();
         return ResponseEntity.status(HttpStatus.OK).body(transactions);
     }
+
+    @GetMapping("/profits")
+    public ResponseEntity<List<ProfitResponseDTO>> getAll(
+            SearchProfitsRequestDTO requestDTO) {
+        List<ProfitResponseDTO> profits = getAllProfits.getAll(mapper.toQuery(requestDTO))
+                .stream()
+                .map(mapper::fromDomain)
+                .toList();
+        return ResponseEntity.status(HttpStatus.OK).body(profits);
+    }
+    
 
 }

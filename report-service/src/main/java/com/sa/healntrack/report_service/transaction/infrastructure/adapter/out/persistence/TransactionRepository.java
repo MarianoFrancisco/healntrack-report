@@ -8,11 +8,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sa.healntrack.report_service.transaction.application.port.in.get_all_profits.GetAllProfitsQuery;
 import com.sa.healntrack.report_service.transaction.application.port.in.get_all_transactions.GetAllTransactionsQuery;
 import com.sa.healntrack.report_service.transaction.application.port.out.persistence.ExistsTransactionByReferenceId;
+import com.sa.healntrack.report_service.transaction.application.port.out.persistence.FindAllProfits;
 import com.sa.healntrack.report_service.transaction.application.port.out.persistence.FindAllTransactions;
 import com.sa.healntrack.report_service.transaction.application.port.out.persistence.SaveTransaction;
 import com.sa.healntrack.report_service.transaction.domain.Transaction;
+import com.sa.healntrack.report_service.transaction.domain.TransactionProfit;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence.entity.TransactionEntity;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence.mapper.TransactionPersistenceMapper;
 import com.sa.healntrack.report_service.transaction.infrastructure.adapter.out.persistence.repository.TransactionEntityRepository;
@@ -22,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
-public class TransactionRepository implements SaveTransaction, FindAllTransactions, ExistsTransactionByReferenceId {
+public class TransactionRepository implements SaveTransaction, FindAllTransactions, ExistsTransactionByReferenceId, FindAllProfits {
 
     private final TransactionPersistenceMapper mapper;
     private final TransactionEntityRepository repository;
@@ -51,6 +54,12 @@ public class TransactionRepository implements SaveTransaction, FindAllTransactio
     @Override
     public boolean existsByReferenceId(UUID referenceId) {
         return repository.existsByReferenceId(referenceId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<TransactionProfit> findAll(GetAllProfitsQuery query) {
+        return repository.findProfitsFiltered(query.area(), query.startDate(), query.endDate());
     }
 
 }
