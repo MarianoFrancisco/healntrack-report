@@ -18,18 +18,18 @@ public interface TransactionEntityRepository
     boolean existsByReferenceId(UUID referenceId);
 
     @Query("""
-            SELECT new com.sa.healntrack.report_service.transaction.domain.TransactionProfit(
-                t.referenceId,
-                new com.sa.healntrack.report_service.area.domain.Area(a.id, a.name, a.entityReference),
-                SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE -t.amount END),
-                t.occurredAt
-            )
-            FROM TransactionEntity t
-            JOIN t.area a
-            WHERE (:areaId IS NULL OR a.id = :areaId)
-              AND (:startDate IS NULL OR t.occurredAt >= :startDate)
-              AND (:endDate IS NULL OR t.occurredAt <= :endDate)
-            GROUP BY t.referenceId, t.occurredAt, a.id, a.name, a.entityReference
+                SELECT new com.sa.healntrack.report_service.transaction.domain.TransactionProfit(
+                    t.referenceId,
+                    new com.sa.healntrack.report_service.area.domain.Area(a.id, a.name, a.entityReference),
+                    SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE -t.amount END),
+                    t.occurredAt
+                )
+                FROM TransactionEntity t
+                JOIN t.area a
+                WHERE (:areaId IS NULL OR a.id = :areaId)
+                  AND (:startDate IS NULL OR t.occurredAt >= CAST(:startDate AS timestamp))
+                  AND (:endDate IS NULL OR t.occurredAt <= CAST(:endDate AS timestamp))
+                GROUP BY t.referenceId, t.occurredAt, a.id, a.name, a.entityReference
             """)
     List<TransactionProfit> findProfits(
             @Param("areaId") UUID areaId,
