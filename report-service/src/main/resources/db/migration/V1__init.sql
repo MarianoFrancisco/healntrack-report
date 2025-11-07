@@ -32,7 +32,7 @@ create table dim_room (
 create table dim_area (
     id uuid primary key default gen_random_uuid(),
     name varchar(50) unique not null,
-    entity_reference varchar(25) check (entity_reference in ('EMPLOYEE', 'MEDICINE', 'ROOM', 'PATIENT')) not null,
+    entity_reference varchar(25) check (entity_reference in ('EMPLOYEE', 'MEDICINE', 'ROOM', 'PATIENT')) not null
 );
 
 create table fact_transaction (
