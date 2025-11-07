@@ -39,7 +39,7 @@ create table fact_transaction (
     id uuid primary key,
     area_id uuid not null,
     type varchar(10) check (type in ('INCOME', 'EXPENSE')) not null,
-    reference_id uuid unique not null,
+    reference_id uuid not null,
     amount numeric(10,2) not null,
     occurred_at date not null,
     created_at timestamp not null,
