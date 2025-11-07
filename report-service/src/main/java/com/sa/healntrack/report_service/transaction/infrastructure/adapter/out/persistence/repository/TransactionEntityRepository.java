@@ -27,11 +27,11 @@ public interface TransactionEntityRepository
             FROM TransactionEntity t
             JOIN t.area a
             WHERE (:areaId IS NULL OR a.id = :areaId)
-              AND (:startDate IS NULL OR t.occurredAt >= CAST(:startDate AS date))
-              AND (:endDate IS NULL OR t.occurredAt <= CAST(:endDate AS date))
+              AND (:startDate IS NULL OR t.occurredAt >= :startDate)
+              AND (:endDate IS NULL OR t.occurredAt <= :endDate)
             GROUP BY t.referenceId, t.occurredAt, a.id, a.name, a.entityReference
             """)
-    List<TransactionProfit> findProfitsFiltered(
+    List<TransactionProfit> findProfits(
             @Param("areaId") UUID areaId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);

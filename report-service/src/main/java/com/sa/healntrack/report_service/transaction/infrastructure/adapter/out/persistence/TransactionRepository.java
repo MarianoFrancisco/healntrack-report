@@ -59,7 +59,7 @@ public class TransactionRepository implements SaveTransaction, FindAllTransactio
     @Transactional(readOnly = true)
     @Override
     public List<TransactionProfit> findAll(GetAllProfitsQuery query) {
-        return repository.findProfitsFiltered(query.area(), query.startDate(), query.endDate());
+        return repository.findProfits(query.area(), query.startDate(), query.endDate());
     }
 
 }
