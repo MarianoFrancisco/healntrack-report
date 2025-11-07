@@ -14,6 +14,6 @@ WORKDIR /app
 
 COPY --from=build /app/target/report-service-1.0.0.jar app.jar
 
-EXPOSE 8003
+EXPOSE 8008
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
