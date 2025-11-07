@@ -65,13 +65,15 @@ public class TransactionRepository implements SaveTransaction, FindAllTransactio
         Specification<TransactionEntity> specs = Specification.allOf(
                 TransactionSpecs.hasArea(query.area()),
                 TransactionSpecs.occurredBetween(query.startDate(), query.endDate()));
-        return repository.findAll(specs).stream()
+        List<TransactionProfit> profits = repository.findAll(specs).stream()
                 .map(t -> new TransactionProfit(
                         t.getReferenceId(),
                         new Area(t.getArea().getId(), t.getArea().getName(), t.getArea().getEntityReference()),
                         t.getType().equals(TransactionType.INCOME) ? t.getAmount() : t.getAmount().negate(),
                         t.getOccurredAt()
                 ))
+                .toList();
+        return profits.stream()
                 .filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0)
                 .toList();
     }
